@@ -4,9 +4,10 @@
   "description": "Frontend Vibe Coding Skills - AI Design Intelligence Kit",
   "type": "module",
   "bin": {
-    "uipro": "./cli/dist/index.js"
+    "uipro": "./bin/uipro.mjs"
   },
   "files": [
+    "bin",
     "cli/dist",
     "cli/assets",
     "cli/package.json"
