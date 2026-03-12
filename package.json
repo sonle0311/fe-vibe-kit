@@ -8,7 +8,8 @@
   },
   "files": [
     "cli/dist",
-    "cli/assets"
+    "cli/assets",
+    "cli/package.json"
   ],
   "scripts": {
     "build": "cd cli && npx -y bun build src/index.ts --outdir dist --target node",
