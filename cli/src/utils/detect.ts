@@ -7,56 +7,54 @@ interface DetectionResult {
   suggested: AIType | null;
 }
 
+// Mapping: folder name → AIType
+const FOLDER_TO_AI_TYPE: Record<string, AIType> = {
+  '.claude': 'claude',
+  '.cursor': 'cursor',
+  '.windsurf': 'windsurf',
+  '.agent': 'antigravity',
+  '.github': 'copilot',
+  '.kiro': 'kiro',
+  '.codex': 'codex',
+  '.roo': 'roocode',
+  '.qoder': 'qoder',
+  '.gemini': 'gemini',
+  '.trae': 'trae',
+  '.opencode': 'opencode',
+  '.continue': 'continue',
+  '.codebuddy': 'codebuddy',
+  '.factory': 'droid',
+};
+
+// Mapping: AIType → display description
+const AI_TYPE_DESCRIPTIONS: Record<AIType, string> = {
+  claude: 'Claude Code (.claude/skills/)',
+  cursor: 'Cursor (.cursor/skills/)',
+  windsurf: 'Windsurf (.windsurf/skills/)',
+  antigravity: 'Antigravity (.agent/skills/)',
+  copilot: 'GitHub Copilot (.github/prompts/)',
+  kiro: 'Kiro (.kiro/steering/)',
+  codex: 'Codex (.codex/skills/)',
+  roocode: 'RooCode (.roo/skills/)',
+  qoder: 'Qoder (.qoder/skills/)',
+  gemini: 'Gemini CLI (.gemini/skills/)',
+  trae: 'Trae (.trae/skills/)',
+  opencode: 'OpenCode (.opencode/skills/)',
+  continue: 'Continue (.continue/skills/)',
+  codebuddy: 'CodeBuddy (.codebuddy/skills/)',
+  droid: 'Droid (Factory) (.factory/skills/)',
+  all: 'All AI assistants',
+};
+
 export function detectAIType(cwd: string = process.cwd()): DetectionResult {
   const detected: AIType[] = [];
 
-  if (existsSync(join(cwd, '.claude'))) {
-    detected.push('claude');
-  }
-  if (existsSync(join(cwd, '.cursor'))) {
-    detected.push('cursor');
-  }
-  if (existsSync(join(cwd, '.windsurf'))) {
-    detected.push('windsurf');
-  }
-  if (existsSync(join(cwd, '.agent'))) {
-    detected.push('antigravity');
-  }
-  if (existsSync(join(cwd, '.github'))) {
-    detected.push('copilot');
-  }
-  if (existsSync(join(cwd, '.kiro'))) {
-    detected.push('kiro');
-  }
-  if (existsSync(join(cwd, '.codex'))) {
-    detected.push('codex');
-  }
-  if (existsSync(join(cwd, '.roo'))) {
-    detected.push('roocode');
-  }
-  if (existsSync(join(cwd, '.qoder'))) {
-    detected.push('qoder');
-  }
-  if (existsSync(join(cwd, '.gemini'))) {
-    detected.push('gemini');
-  }
-  if (existsSync(join(cwd, '.trae'))) {
-    detected.push('trae');
-  }
-  if (existsSync(join(cwd, '.opencode'))) {
-    detected.push('opencode');
-  }
-  if (existsSync(join(cwd, '.continue'))) {
-    detected.push('continue');
-  }
-  if (existsSync(join(cwd, '.codebuddy'))) {
-    detected.push('codebuddy');
-  }
-  if (existsSync(join(cwd, '.factory'))) {
-    detected.push('droid');
+  for (const [folder, aiType] of Object.entries(FOLDER_TO_AI_TYPE)) {
+    if (existsSync(join(cwd, folder))) {
+      detected.push(aiType);
+    }
   }
 
-  // Suggest based on what's detected
   let suggested: AIType | null = null;
   if (detected.length === 1) {
     suggested = detected[0];
@@ -68,38 +66,5 @@ export function detectAIType(cwd: string = process.cwd()): DetectionResult {
 }
 
 export function getAITypeDescription(aiType: AIType): string {
-  switch (aiType) {
-    case 'claude':
-      return 'Claude Code (.claude/skills/)';
-    case 'cursor':
-      return 'Cursor (.cursor/skills/)';
-    case 'windsurf':
-      return 'Windsurf (.windsurf/skills/)';
-    case 'antigravity':
-      return 'Antigravity (.agent/skills/)';
-    case 'copilot':
-      return 'GitHub Copilot (.github/prompts/)';
-    case 'kiro':
-      return 'Kiro (.kiro/steering/)';
-    case 'codex':
-      return 'Codex (.codex/skills/)';
-    case 'roocode':
-      return 'RooCode (.roo/skills/)';
-    case 'qoder':
-      return 'Qoder (.qoder/skills/)';
-    case 'gemini':
-      return 'Gemini CLI (.gemini/skills/)';
-    case 'trae':
-      return 'Trae (.trae/skills/)';
-    case 'opencode':
-      return 'OpenCode (.opencode/skills/)';
-    case 'continue':
-      return 'Continue (.continue/skills/)';
-    case 'codebuddy':
-      return 'CodeBuddy (.codebuddy/skills/)';
-    case 'droid':
-      return 'Droid (Factory) (.factory/skills/)';
-    case 'all':
-      return 'All AI assistants';
-  }
+  return AI_TYPE_DESCRIPTIONS[aiType];
 }

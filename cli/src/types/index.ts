@@ -39,6 +39,7 @@ export interface PlatformConfig {
   title: string;
   description: string;
   skillOrWorkflow: string;
+  extraSkills?: string[];
 }
 
 export const AI_TYPES: AIType[] = ['claude', 'cursor', 'windsurf', 'antigravity', 'copilot', 'roocode', 'kiro', 'codex', 'qoder', 'gemini', 'trae', 'opencode', 'continue', 'codebuddy', 'droid', 'all'];

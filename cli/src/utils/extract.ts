@@ -1,10 +1,11 @@
-import { mkdir, rm, access, cp, mkdtemp, readdir } from 'node:fs/promises';
+import { mkdir, rm, cp, mkdtemp, readdir } from 'node:fs/promises';
 import { join, basename } from 'node:path';
 import { exec } from 'node:child_process';
 import { promisify } from 'node:util';
 import { tmpdir } from 'node:os';
 import type { AIType } from '../types/index.js';
 import { AI_FOLDERS } from '../types/index.js';
+import { exists } from './fs.js';
 
 const execAsync = promisify(exec);
 
@@ -20,15 +21,6 @@ export async function extractZip(zipPath: string, destDir: string): Promise<void
     }
   } catch (error) {
     throw new Error(`Failed to extract zip: ${error}`);
-  }
-}
-
-async function exists(path: string): Promise<boolean> {
-  try {
-    await access(path);
-    return true;
-  } catch {
-    return false;
   }
 }
 

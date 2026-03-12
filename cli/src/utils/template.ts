@@ -1,29 +1,14 @@
-import { readFile, mkdir, writeFile, cp, access, readdir } from 'node:fs/promises';
+import { readFile, mkdir, writeFile, cp } from 'node:fs/promises';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import type { PlatformConfig } from '../types/index.js';
+import { exists } from './fs.js';
+
+export type { PlatformConfig };
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 // After bun build: dist/index.js -> ../assets = cli/assets ✓
 const ASSETS_DIR = join(__dirname, '..', 'assets');
-
-export interface PlatformConfig {
-  platform: string;
-  displayName: string;
-  installType: 'full' | 'reference';
-  folderStructure: {
-    root: string;
-    skillPath: string;
-    filename: string;
-  };
-  scriptPath: string;
-  frontmatter: Record<string, string> | null;
-  sections: {
-    quickReference: boolean;
-  };
-  title: string;
-  description: string;
-  skillOrWorkflow: string;
-}
 
 // Map AIType to platform config file name
 const AI_TO_PLATFORM: Record<string, string> = {
@@ -44,14 +29,7 @@ const AI_TO_PLATFORM: Record<string, string> = {
   droid: 'droid',
 };
 
-async function exists(path: string): Promise<boolean> {
-  try {
-    await access(path);
-    return true;
-  } catch {
-    return false;
-  }
-}
+
 
 /**
  * Load platform configuration from JSON file
@@ -166,6 +144,34 @@ async function copyDataAndScripts(targetSkillDir: string): Promise<void> {
 }
 
 /**
+ * Copy extra skills (brand, design, design-system, etc.) to target skills directory
+ */
+async function copyExtraSkills(
+  targetSkillsDir: string,
+  extraSkills: string[]
+): Promise<string[]> {
+  const copiedSkills: string[] = [];
+  const extraSkillsSource = join(ASSETS_DIR, 'extra-skills');
+
+  if (!(await exists(extraSkillsSource))) {
+    return copiedSkills;
+  }
+
+  for (const skillName of extraSkills) {
+    const source = join(extraSkillsSource, skillName);
+    const target = join(targetSkillsDir, skillName);
+
+    if (await exists(source)) {
+      await mkdir(target, { recursive: true });
+      await cp(source, target, { recursive: true });
+      copiedSkills.push(skillName);
+    }
+  }
+
+  return copiedSkills;
+}
+
+/**
  * Generate platform files for a specific AI type
  * All platforms use self-contained installation with data and scripts
  */
@@ -194,6 +200,19 @@ export async function generatePlatformFiles(
 
   // Copy data and scripts into the skill directory (self-contained)
   await copyDataAndScripts(skillDir);
+
+  // Copy extra skills if configured
+  if (config.extraSkills && config.extraSkills.length > 0) {
+    // Derive parent folder from skillPath (e.g. "skills/ui-ux-pro-max" -> "skills", "prompts/ui-ux-pro-max" -> "prompts")
+    const skillsParent = config.folderStructure.skillPath.split('/')[0];
+    const skillsDir = join(targetDir, config.folderStructure.root, skillsParent);
+    const copiedSkills = await copyExtraSkills(skillsDir, config.extraSkills);
+    if (copiedSkills.length > 0) {
+      createdFolders.push(
+        ...copiedSkills.map(s => `${config.folderStructure.root}/${skillsParent}/${s}`)
+      );
+    }
+  }
 
   return createdFolders;
 }
