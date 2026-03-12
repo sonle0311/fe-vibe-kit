@@ -1,0 +1,27 @@
+{
+  "name": "fe-vibe-kit",
+  "version": "1.0.0",
+  "description": "Frontend Vibe Coding Skills - AI Design Intelligence Kit",
+  "type": "module",
+  "bin": {
+    "uipro": "./cli/dist/index.js"
+  },
+  "files": [
+    "cli/dist",
+    "cli/assets"
+  ],
+  "scripts": {
+    "build": "cd cli && npx -y bun build src/index.ts --outdir dist --target node",
+    "postinstall": "echo FE Vibe Kit installed successfully!"
+  },
+  "keywords": [
+    "ui", "ux", "design", "vibe-coding", "ai-skills",
+    "claude", "cursor", "windsurf", "copilot", "antigravity"
+  ],
+  "author": "sonle0311",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sonle0311/fe-vibe-kit.git"
+  }
+}
